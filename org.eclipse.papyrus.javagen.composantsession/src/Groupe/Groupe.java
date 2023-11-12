@@ -57,10 +57,12 @@ public class Groupe extends SqlUtils {
     }
 
     public static List<Groupe> getAll() {
-        List<Groupe> result = new ArrayList<>();
+        
         SqlUtils sql = new SqlUtils();
         sql.connect();
         ResultSet set = sql.requestSelect("SELECT * FROM GROUPE");
+        
+        List<Groupe> result = new ArrayList<>();
 
         try {
             while (set.next()) {
@@ -69,19 +71,21 @@ public class Groupe extends SqlUtils {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            sql.disconnect();
+            return result;
         }
         sql.disconnect();
-        return result;
+		return result;
+        
     }
 
     @Override
     public String toString() {
-        return "Groupe{" +
-                "id='" + id + '\'' +
-                ", eleveID='" + eleveID + '\'' +
-                ", sujetID='" + sujetID + '\'' +
-                ", ueID='" + ueID + '\'' +
-                '}';
+        return "id= " + id +" "+ ':'+ '\n' +
+                "eleveID='" + eleveID + '\n' +
+                "sujetID='" + sujetID + '\n' +
+                "ueID='" + ueID + '\n' +
+                '\n';
     }
 
     // Getters and Setters

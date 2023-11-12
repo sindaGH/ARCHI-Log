@@ -307,39 +307,29 @@ public class GroupeImplementation implements GroupeInterface {
 
 	@Override
 	public String deleteGroupe(String JSONEntry) {
-		// TODO Auto-generated method stub
-		String UE = null;
-		String eleve = null;
-		String sujet = null;
+		
+		String UUID = null;
 		JSONObject obj = new JSONObject(JSONEntry);
 		try {
 
-			UE = obj.getString("UE");
-			eleve = obj.getString("eleve");
-			sujet = obj.getString("sujet");
-
-			UniteEnseignement ue = UniteEnseignement.getById(UE);
-			Eleve objEleve = Eleve.getById(eleve);
-			Sujet cr = Sujet.getById(sujet);
-
-			cr.setUniteEnseignement(null);
-			cr.setEleve(null);
-			cr.update();
+			UUID = obj.getString("UUID");
 
 		} catch (JSONException e) {
-			System.out.println("Unexpected json file, should be: UE,eleve,sujet");
+			System.out.println("Unexpected json file, should be: UUID");
 
 		}
-		// String id = UUID.randomUUID().toString();
-
+		try {
+			Groupe.getById(UUID).delete();
+			return "{ \"result\": \"done\" ,  \"type\": \"Groupe\" , \"GID\": \"" + UUID + "\"  }";
+		} catch (Exception e) {			
 		// String ret = "{ \"id\": \"" + id + "\"}";
-		return "{ \"result\": \"done\"}";
+			return "{ \"result\": \"error\" ,  \"type\": \"groupe inexistant\"   }";
 		// return ret;
+	  }
 	}
 
 	@Override
 	public String deleteEleve(String JSONEntry) {
-		// TODO Auto-generated method stub
 		String UUID = null;
 		JSONObject obj = new JSONObject(JSONEntry);
 		try {
@@ -354,14 +344,14 @@ public class GroupeImplementation implements GroupeInterface {
 			Eleve.getById(UUID).delete();
 			return "{ \"result\": \"done\" ,  \"type\": \"eleve\" , \"UUID\": \"" + UUID + "\"  }";
 		} catch (Exception e) {
-			return "{ \"result\": \"error\" ,  \"type\": \"eleve inexistante\"   }";
+			return "{ \"result\": \"error\" ,  \"type\": \"eleve inexistant\"   }";
 
 		}
 	}
 
 	@Override
 	public String getEleve(String JSONEntry) {
-		// TODO This should return JSON
+		
 		JSONObject obj = new JSONObject(JSONEntry);
 		Eleve x = Eleve.getById(obj.getString("id"));
 		if (x != null)
@@ -379,10 +369,18 @@ public class GroupeImplementation implements GroupeInterface {
 
 	@Override
 	public String getGroupe(String JSONEntry) {
-		// TODO This should return JSON
 		JSONObject obj = new JSONObject(JSONEntry);
-		//TODO we need to find a way to show Groupes (not yet implemented)
-		return " " ;
+		Groupe x = Groupe.getById(obj.getString("id"));
+		if (x != null)
+		{	
+			String eID = x.getEleveID();
+			String sID = x.getSujetID();
+			obj.put("eleveID", eID);
+			obj.put("sujetID", sID);
+			return obj.toString() ;
+		}
+		else
+			return "erreur"; 
 	}
 
 	@Override
@@ -428,7 +426,7 @@ public class GroupeImplementation implements GroupeInterface {
 
 	@Override
 	public String listEleve() {
-		// TODO Auto-generated method stub
+		
 		List <Eleve>  x = Eleve.getAll();
 		String resp = "";
 		for (int i= 0 ; i < x.size();i++)
@@ -443,9 +441,16 @@ public class GroupeImplementation implements GroupeInterface {
 
 	@Override
 	public String listGroupe() {
-		// TODO Auto-generated method stub
-		return null;
-		// TODO list all Groupes
+		List <Groupe>  x = Groupe.getAll();
+		String resp = "";
+		for (int i= 0 ; i < x.size();i++)
+		{
+			resp = resp + x.get(i).toString();
+		}
+		JSONObject obj = new JSONObject();
+		obj.put("response", resp);
+		
+		return obj.toString();
 	}
 
 	@Override
